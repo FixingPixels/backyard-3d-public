@@ -39,7 +39,11 @@ function localBackend() {
     },
     createPlan: save, savePlan: save, deletePlan: save, saveSettings: save,
     imports: {
-      async list() { return (await blobstore.allImports()).map((r) => ({ ...r, canDelete: true })); },
+      // The yard's AI-made examples too, as in the demo: its starting layout uses them.
+      async list() {
+        const examples = AI_EXAMPLES.map((e) => ({ ...e, ai: true, canDelete: false }));
+        return [...examples, ...(await blobstore.allImports()).map((r) => ({ ...r, canDelete: true }))];
+      },
       async add({ label, data, scale, thumbnail }) {
         const record = { id: crypto.randomUUID().slice(0, 8), label, data, scale, thumbnail, added: Date.now() };
         await blobstore.putImport(record);
